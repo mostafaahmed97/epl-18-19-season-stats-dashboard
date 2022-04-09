@@ -1,17 +1,13 @@
-from re import template
-from turtle import title
-from dash import Dash, html, dcc
-from dash.dependencies import Output, Input, State
+from maindash import app
+from dash import html, dcc
+from dash.dependencies import Output, Input
 
 import plotly.express as px
-import plotly.graph_objects as go
 import pandas as pd
 import dash_daq as daq
 
-df = pd.read_csv("epl-players-18-19.csv")
-
+df = pd.read_csv("data/epl-players-18-19.csv")
 teams = sorted(df["Current Club"].unique())
-
 positions = df["position"].unique()
 
 bar_plot_statistics_opts = {
@@ -30,15 +26,6 @@ bar_plot_statistics_opts = {
     "red_cards_overall": "Red Cards",
 }
 
-
-app = Dash(
-    name="EPLStats",
-    external_stylesheets=[
-        "https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css",
-    ],
-)
-
-
 team_picker = dcc.Dropdown(
     teams,
     [],
@@ -56,18 +43,6 @@ bar_bot_ctrls = html.Div(
                 html.P("Hide zeros"),
                 daq.BooleanSwitch(id="barCtrlsSwitch", on=True),
             ],
-            className="row align-self-center col-md-4 col-12",
-        ),
-        html.Div(
-            [
-                html.P("Sort"),
-                dcc.Dropdown(
-                    ["asc", "desc", "no"],
-                    id="barCtrlsOrder",
-                    value="desc",
-                    clearable=False,
-                ),
-            ],
             className="col-md-4 col-12",
         ),
         html.Div(
@@ -77,6 +52,7 @@ bar_bot_ctrls = html.Div(
                     bar_plot_statistics_opts,
                     id="barCtrlsStatistic",
                     value="goals_overall",
+                    clearable=False,
                 ),
             ],
             className="col-md-4 col-12",
@@ -85,6 +61,13 @@ bar_bot_ctrls = html.Div(
             [
                 html.P("Position"),
                 dcc.Dropdown(positions, id="barCtrlsPos"),
+            ],
+            className="col-md-4 col-12",
+        ),
+        html.Div(
+            [
+                html.P("Show Top 10 Only"),
+                daq.BooleanSwitch(id="barCtrlsTopOnly", on=False),
             ],
             className="col-md-4 col-12",
         ),
@@ -101,27 +84,16 @@ bar_plot = html.Div(
     className="col-12",
 )
 
-app.layout = html.Div(
-    [
-        html.H3(
-            "Premier League Statistics Season 18/19",
-            className="text-center py-2",
-        ),
-        bar_plot,
-    ],
-    className="p-4",
-)
-
 
 @app.callback(
     Output("barPlot", "figure"),
     Input("barCtrlsSwitch", "on"),
-    Input("barCtrlsOrder", "value"),
+    Input("barCtrlsTopOnly", "on"),
     Input("barCtrlsStatistic", "value"),
     Input("barCtrlsPos", "value"),
     Input("barTeamPicker", "value"),
 )
-def update_bar_plot(hide_zeros, order, statistic, player_pos, team):
+def update_bar_plot(hide_zeros, top_only, statistic, player_pos, team):
 
     # Init filter
     if hide_zeros:
@@ -137,13 +109,15 @@ def update_bar_plot(hide_zeros, order, statistic, player_pos, team):
 
     filtered_df = df[filter]
 
-    if order != "no":
-        filtered_df = filtered_df.sort_values(
-            by=statistic,
-            ascending=True if order == "asc" else False,
-        )
+    filtered_df = filtered_df.sort_values(
+        by=statistic,
+        ascending=False,
+    )
 
-    print("updating ", order, statistic, player_pos, team)
+    if top_only:
+        filtered_df = filtered_df.head(10)
+
+    print(filtered_df["Current Club"].value_counts())
 
     fig = px.bar(
         filtered_df,
@@ -151,7 +125,11 @@ def update_bar_plot(hide_zeros, order, statistic, player_pos, team):
         y=statistic,
         text=statistic,
         color="Current Club",
-        hover_data=["age", "position", "Current Club"],
+        hover_data=[
+            "age",
+            "position",
+            "Current Club",
+        ],
         template="simple_white",
     )
 
@@ -165,6 +143,3 @@ def update_bar_plot(hide_zeros, order, statistic, player_pos, team):
     )
 
     return fig
-
-
-app.run_server(debug=True, dev_tools_hot_reload=True)
