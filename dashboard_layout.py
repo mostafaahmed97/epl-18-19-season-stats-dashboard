@@ -1,11 +1,9 @@
-from maindash import app
-from dash.dependencies import Output, Input, State
-from dash import html, dcc
-
-from graphs.player_stats_bar import bar_plot
+from dash import html
+from graphs import bar_plot, hist_plot
 
 
-def make_layout():
+def generate_layout():
+    print("Creating layout")
     return html.Div(
         [
             html.H3(
@@ -13,6 +11,8 @@ def make_layout():
                 className="text-center py-2",
             ),
             bar_plot,
+            html.Br(),
+            hist_plot,
         ],
         className="p-4",
     )

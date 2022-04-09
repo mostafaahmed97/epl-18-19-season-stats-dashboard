@@ -1,6 +1,8 @@
 from maindash import app
 from dash import html, dcc
 from dash.dependencies import Output, Input
+from plotly.graph_objects import Layout
+from plotly.validator_cache import ValidatorCache
 
 import plotly.express as px
 import pandas as pd
@@ -26,18 +28,21 @@ bar_plot_statistics_opts = {
     "red_cards_overall": "Red Cards",
 }
 
-team_picker = dcc.Dropdown(
-    teams,
-    [],
-    id="barTeamPicker",
-    multi=True,
-    clearable=True,
-    placeholder="Choose Teams",
-)
-
-
-bar_bot_ctrls = html.Div(
+bar_ctrls = html.Div(
     [
+        html.Div(
+            [
+                dcc.Dropdown(
+                    teams,
+                    [],
+                    id="barTeamPicker",
+                    multi=True,
+                    clearable=True,
+                    placeholder="Choose Teams",
+                )
+            ],
+            className="col-12 mb-2",
+        ),
         html.Div(
             [
                 html.P("Hide zeros"),
@@ -77,9 +82,8 @@ bar_bot_ctrls = html.Div(
 
 bar_plot = html.Div(
     [
-        team_picker,
         dcc.Graph(id="barPlot"),
-        bar_bot_ctrls,
+        bar_ctrls,
     ],
     className="col-12",
 )
@@ -116,8 +120,6 @@ def update_bar_plot(hide_zeros, top_only, statistic, player_pos, team):
 
     if top_only:
         filtered_df = filtered_df.head(10)
-
-    print(filtered_df["Current Club"].value_counts())
 
     fig = px.bar(
         filtered_df,
