@@ -13,6 +13,8 @@ df = pd.read_csv("data/epl-players-18-19.csv")
 teams = sorted(df["Current Club"].unique())
 
 hist_opts = {
+    "age": "Age",
+    "position": "Position",
     "goals_overall": "Goals",
     "appearances_overall": "Appearances",
     "assists_overall": "Assists",
@@ -28,7 +30,7 @@ hist_ctrls = html.Div(
                 dcc.Dropdown(
                     hist_opts,
                     id="histCtrlsStatistic",
-                    value="goals_overall",
+                    value="age",
                     clearable=False,
                 ),
             ]
@@ -62,5 +64,16 @@ hist_plot = html.Div(
     Input("histTeamPicker", "value"),
 )
 def update_hist(statistic, teams):
-    hist_figure = px.histogram(df, x=statistic, histnorm="probability density")
-    return hist_figure
+    fig = px.histogram(
+        df,
+        x=statistic,
+        opacity=0.69,
+        template="simple_white",
+    )
+
+    fig.update_layout(
+        plot_bgcolor="#fafafa",
+        xaxis_title=statistic.title().replace("_", " "),
+    )
+
+    return fig

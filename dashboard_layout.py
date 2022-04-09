@@ -1,5 +1,5 @@
 from dash import html
-from graphs import bar_plot, hist_plot
+from graphs import bar_plot, hist_plot, banner
 
 
 def generate_layout():
@@ -10,6 +10,7 @@ def generate_layout():
                 "Premier League Statistics Season 18/19",
                 className="text-center py-2",
             ),
+            banner,
             bar_plot,
             html.Br(),
             hist_plot,
