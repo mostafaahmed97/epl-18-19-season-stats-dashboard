@@ -7,12 +7,13 @@ from plotly.validator_cache import ValidatorCache
 import plotly.express as px
 import pandas as pd
 import dash_daq as daq
+import dash_bootstrap_components as dbc
 
 df = pd.read_csv("data/epl-players-18-19.csv")
 teams = sorted(df["Current Club"].unique())
 positions = df["position"].unique()
 
-bar_plot_statistics_opts = {
+players_bar_plot_statistics_opts = {
     "goals_overall": "Goals",
     "goals_away": "Goals (Away)",
     "goals_home": "Goals (Home)",
@@ -46,15 +47,15 @@ bar_ctrls = html.Div(
         html.Div(
             [
                 html.P("Hide zeros"),
-                daq.BooleanSwitch(id="barCtrlsSwitch", on=True),
+                dbc.Checkbox(id="barCtrlsSwitch", value=True, className="ml-2"),
             ],
-            className="col-md-4 col-12",
+            className="col-md-4 col-12 row align-items-center align-center",
         ),
         html.Div(
             [
                 html.P("Statistic"),
                 dcc.Dropdown(
-                    bar_plot_statistics_opts,
+                    players_bar_plot_statistics_opts,
                     id="barCtrlsStatistic",
                     value="goals_overall",
                     clearable=False,
@@ -72,32 +73,41 @@ bar_ctrls = html.Div(
         html.Div(
             [
                 html.P("Show Top 10 Only"),
-                daq.BooleanSwitch(id="barCtrlsTopOnly", on=False),
+                dbc.Checkbox(id="barCtrlsTopOnly", value=False, className="ml-2"),
             ],
-            className="col-md-4 col-12",
+            className="col-md-4 col-12 row align-items-center align-center",
         ),
     ],
     className="row wrap",
 )
 
-bar_plot = html.Div(
+players_bar_plot = html.Div(
     [
+        html.Div(
+            [
+                html.H5(
+                    "Player Statistics",
+                    className="mx-auto",
+                )
+            ],
+            className="row mt-4",
+        ),
         dcc.Graph(id="barPlot"),
         bar_ctrls,
     ],
-    className="col-12",
+    className="col-12 bg-white p-4 rounded mt-4",
 )
 
 
 @app.callback(
     Output("barPlot", "figure"),
-    Input("barCtrlsSwitch", "on"),
-    Input("barCtrlsTopOnly", "on"),
+    Input("barCtrlsSwitch", "value"),
+    Input("barCtrlsTopOnly", "value"),
     Input("barCtrlsStatistic", "value"),
     Input("barCtrlsPos", "value"),
     Input("barTeamPicker", "value"),
 )
-def update_bar_plot(hide_zeros, top_only, statistic, player_pos, team):
+def update_players_bar_plot(hide_zeros, top_only, statistic, player_pos, team):
 
     # Init filter
     if hide_zeros:

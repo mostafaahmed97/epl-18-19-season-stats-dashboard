@@ -35,5 +35,5 @@ banner = html.Div(
             className="col-md-4 col-6 text-center",
         ),
     ],
-    className="mx-auto row wrap outlined rounded border bg-light",
+    className="mx-auto row wrap outlined rounded border bg-white",
 )

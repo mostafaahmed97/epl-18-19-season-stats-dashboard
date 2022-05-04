@@ -47,14 +47,20 @@ hist_ctrls = html.Div(
     ]
 )
 
-hist_plot = html.Div(
+players_hist_plot = html.Div(
     [
+        html.Div(
+            [
+                html.H5("Player Statistics Distribution", className="mx-auto"),
+            ],
+            className="row",
+        ),
         dcc.Graph(
             id="histPlot",
         ),
         hist_ctrls,
     ],
-    className="col-12",
+    className="col-12 bg-white rounded p-4 mt-2",
 )
 
 

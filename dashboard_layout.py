@@ -1,5 +1,5 @@
 from dash import html
-from graphs import bar_plot, hist_plot, banner
+from graphs import players_bar_plot, players_hist_plot, banner, matches_table
 
 
 def generate_layout():
@@ -11,9 +11,11 @@ def generate_layout():
                 className="text-center py-2",
             ),
             banner,
-            bar_plot,
+            players_bar_plot,
             html.Br(),
-            hist_plot,
+            players_hist_plot,
+            html.Br(),
+            matches_table,
         ],
-        className="p-4",
+        className="p-4 bg-light",
     )
