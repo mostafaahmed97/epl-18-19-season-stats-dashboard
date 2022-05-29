@@ -35,15 +35,15 @@ hist_ctrls = html.Div(
                 ),
             ]
         ),
-        dcc.Dropdown(
-            teams,
-            [],
-            id="histTeamPicker",
-            multi=True,
-            clearable=True,
-            placeholder="Choose Teams",
-            className="my-2",
-        ),
+        # dcc.Dropdown(
+        #     teams,
+        #     [],
+        #     id="histTeamPicker",
+        #     multi=True,
+        #     clearable=True,
+        #     placeholder="Choose Teams",
+        #     className="my-2",
+        # ),
     ]
 )
 
@@ -67,12 +67,17 @@ players_hist_plot = html.Div(
 @app.callback(
     Output("histPlot", "figure"),
     Input("histCtrlsStatistic", "value"),
-    Input("histTeamPicker", "value"),
+    # Input("histTeamPicker", "value"),
 )
-def update_hist(statistic, teams):
+def update_hist(statistic):
+    filtered_df = df[statistic]
+
+    if statistic == "age":
+        filtered_df = filtered_df[filtered_df != 0]
+
     fig = px.histogram(
-        df,
-        x=statistic,
+        filtered_df,
+        # x=statistic,
         opacity=0.69,
         template="simple_white",
     )
